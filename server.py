@@ -11,9 +11,9 @@ from fastapi.templating import Jinja2Templates
 from reader3 import Book, BookMetadata, ChapterContent, TOCEntry
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
-# Where are the book folders located?
+# Where are the book folders located? Set via command line or default to current dir
 BOOKS_DIR = "."
 
 @lru_cache(maxsize=10)
@@ -42,7 +42,7 @@ async def library_view(request: Request):
     # Scan directory for folders ending in '_data' that have a book.pkl
     if os.path.exists(BOOKS_DIR):
         for item in os.listdir(BOOKS_DIR):
-            if item.endswith("_data") and os.path.isdir(item):
+            if item.endswith("_data") and os.path.isdir(os.path.join(BOOKS_DIR, item)):
                 # Try to load it to get the title
                 book = load_book_cached(item)
                 if book:
@@ -105,6 +105,12 @@ async def serve_image(book_id: str, image_name: str):
     return FileResponse(img_path)
 
 if __name__ == "__main__":
+    import sys
     import uvicorn
-    print("Starting server at http://127.0.0.1:8123")
+
+    if len(sys.argv) > 1:
+        BOOKS_DIR = sys.argv[1]
+
+    print(f"Starting server at http://127.0.0.1:8123")
+    print(f"Books directory: {os.path.abspath(BOOKS_DIR)}")
     uvicorn.run(app, host="127.0.0.1", port=8123)

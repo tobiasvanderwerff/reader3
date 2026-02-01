@@ -17,8 +17,10 @@ uv run reader3.py dracula.epub
 This creates the directory `dracula_data`, which registers the book to your local library. We can then run the server:
 
 ```bash
-uv run server.py
+uv run server.py [books_directory]
 ```
+
+The optional `books_directory` argument specifies where to look for processed book folders (defaults to current directory).
 
 And visit [localhost:8123](http://localhost:8123/) to see your current Library. You can easily add more books, or delete them from your library by deleting the folder. It's not supposed to be complicated or complex.
 
